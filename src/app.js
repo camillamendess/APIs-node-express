@@ -1,31 +1,28 @@
 import express from "express";
+import connectDatabase from "./config/dbConnect.js";
+import livro from "./models/livros.js";
+
+const connect = await connectDatabase();
+
+connect.on("Error", (erro) => {
+    console.error("Erro de conexão", erro );
+});
+
+connect.once("open", () => {
+    console.log("Conexão com o banco feita com sucesso!");
+});
 
 const app = express();
 app.use(express.json());
 
-const livros = [
-    {
-        id: 1,
-        titulo: "Harry Potter e a pedra filosofal"
-    },
-    {
-        id: 2,
-        titulo: "Jogos Vorazes "
-    }
-];
-
-function buscaLivro(id) {
-    return livros.findIndex(livro => {
-        return livro.id === Number(id);
-    });
-}
 
 app.get("/", (req, res) => {
     res.status(200).send("Curso de Node.js");
 });
 
-app.get("/livros", (req, res) => {
-    res.status(200).json(livros);
+app.get("/livros", async (req, res) => {
+    const listaLivros = await livro.find({});
+    res.status(200).json(listaLivros);
 });
 
 // Pegar um livro com id específico 
@@ -53,3 +50,4 @@ app.delete("/livros/:id", (req, res) => {
 })
 
 export default app;
+
