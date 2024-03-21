@@ -1,68 +1,81 @@
-import livro from "../models/Livro.js";
-import { autor } from "../models/Autor.js";
+import livros from "../models/Livro.js";
 
 class LivroController {
 
-  static async listarLivros(req, res) {
+  static listarLivros = async (req, res) => {
     try {
-      const listaLivros = await livro.find({});
-      res.status(200).json(listaLivros);
-    } catch (error) {
-      res.status(500).json({ message: `${error.message} - Falha na requisição`});
-    }
-  }
+      const livrosResultado = await livros.find()
+        .populate("autor")
+        .exec();
 
-  static async listarLivroPorId (req, res) {
+      res.status(200).json(livrosResultado);
+    } catch (erro) {
+      res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  };
+
+  static listarLivroPorId = async (req, res) => {
     try {
       const id = req.params.id;
-      const livroEncontrado = await livro.findById(id);
-      res.status(200).json(livroEncontrado);
-    } catch (error) {
-      res.status(500).json({ message: `${error.message} - Falha na requisição do livro`});
-    }
-  }
 
-  static async adicionarLivro (req, res) {
-    const novoLivro = req.body;
+      const livroResultados = await livros.findById(id)
+        .populate("autor", "nome")
+        .exec();
+
+      res.status(200).send(livroResultados);
+    } catch (erro) {
+      res.status(400).send({message: `${erro.message} - Id do livro não localizado.`});
+    }
+  };
+
+  static cadastrarLivro = async (req, res) => {
     try {
-      const autorEncontrado = await autor.findById(novoLivro.autor);  
-      const LivroCompleto = { ...novoLivro, autor: { ...autorEncontrado._doc }};
-      const livroCriado = await livro.create(LivroCompleto);
-      res.status(201).json({ message: "Criado com sucesso", livro: livroCriado });
-    } catch (error) {
-      res.status(500).json({ message: `${error.message} - Falha ao cadastrar livro`});
-    }
-  }
+      let livro = new livros(req.body);
 
-  static async atualizarLivro (req, res) {
-    try {
-      const id = req.params.id;
-      await livro.findByIdAndUpdate(id, res.body);
-      res.status(200).json({ message: "Livro atualizado" });
-    } catch (error) {
-      res.status(500).json({ message: `${error.message} - Falha na atualização`});
-    }
-  }
+      const livroResultado = await livro.save();
 
-  static async deleteLivro (req, res) {
+      res.status(201).send(livroResultado.toJSON());
+    } catch (erro) {
+      res.status(500).send({message: `${erro.message} - falha ao cadastrar livro.`});
+    }
+  };
+
+  static atualizarLivro = async (req, res) => {
     try {
       const id = req.params.id;
-      await livro.findByIdAndDelete(id);
-      res.status(200).json({ message: "Livro deletado" });
-    } catch (error) {
-      res.status(500).json({ message: `${error.message} - Falha na remoção`});
-    }
-  }
 
-  static async listarLivrosPorEditora ( req, res ) {
-    const editora = req.query.editora;
-    try {
-      const livrosPorEditora = await livro.find({ editora: editora });
-      res.status(200).json(livrosPorEditora);
-    } catch (error) {
-      res.status(500).json({ message: `${error.message} - Falha na busca`});
+      await livros.findByIdAndUpdate(id, {$set: req.body});
+
+      res.status(200).send({message: "Livro atualizado com sucesso"});
+    } catch (erro) {
+      res.status(500).send({message: erro.message});
     }
-  }
+  };
+
+  static excluirLivro = async (req, res) => {
+    try {
+      const id = req.params.id;
+
+      await livros.findByIdAndDelete(id);
+
+      res.status(200).send({message: "Livro removido com sucesso"});
+    } catch (erro) {
+      res.status(500).send({message: erro.message});
+    }
+  };
+
+  static listarLivroPorEditora = async (req, res) => {
+    try {
+      const editora = req.query.editora;
+
+      const livrosResultado = await livros.find({"editora": editora});
+
+      res.status(200).send(livrosResultado);
+    } catch (erro) {
+      res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  };
+
 }
 
 export default LivroController;

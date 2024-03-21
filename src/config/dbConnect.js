@@ -1,12 +1,10 @@
 import mongoose from "mongoose";
 
-async function connectDatabase() {
-    mongoose.connect(process.env.DB_CONNECTION_STRING);
+mongoose.connect(process.env.STRING_CONEXAO_DB);
 
-    return mongoose.connection;    
-} 
+let db = mongoose.connection;     
 
-export default connectDatabase;
+export default db;
 
 
 

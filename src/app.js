@@ -1,20 +1,16 @@
 import express from "express";
-import connectDatabase from "./config/dbConnect.js";
-import routes from "./routes/index.js";
+import db from "./config/dbConnect.js";
+import routes from "./routes/index.js"; 
+import dotenv from "dotenv";
+dotenv.config();
 
-const connect = await connectDatabase();
-
-connect.on("Error", (erro) => {
-    console.error("Erro de conexão", erro );
-});
-
-connect.once("open", () => {
-    console.log("Conexão com o banco feita com sucesso!");
+db.on("error", console.log.bind(console, "Erro de conexão"));
+db.once("open", () => {
+  console.log("conexão com o banco feita com sucesso");
 });
 
 const app = express();
-
+app.use(express.json());
 routes(app);
 
 export default app;
-
