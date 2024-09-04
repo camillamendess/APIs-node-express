@@ -1,6 +1,6 @@
 ### `APIs com Node.js`
 
-Pequeno projeto desenvolvido durante curso da Alura com o foco em entender APIs utilizando Node.js, Express, MongoDB e Postman. 
+Pequeno projeto desenvolvido durante curso com o foco em entender APIs utilizando Node.js, Express, MongoDB e Postman. 
 
 <i>
   <h5>APIs with Node.js</h5>
